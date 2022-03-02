@@ -1,7 +1,11 @@
 package com.game.kalah.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class GameDTO {
-    private String firstPlayer;
-    private String secondPlayer;
-    private Long matchTime;
+    private String firstPlayerName;
+    private String secondPlayerName;
 }
