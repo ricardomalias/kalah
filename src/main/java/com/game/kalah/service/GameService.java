@@ -6,15 +6,18 @@ import com.game.kalah.model.Game;
 import com.game.kalah.model.GameStatus;
 import com.game.kalah.model.PlayerPing;
 import com.game.kalah.repository.GameRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class GameService {
 
     private final GameRepository gameRepository;
@@ -78,13 +81,19 @@ public class GameService {
 
     public void pingGame(String playerKey) {
         Game game = getGame(playerKey);
+        LocalDateTime now = LocalDateTime.now();
 
         if(playerKey.equals(game.getFirstPlayerKey().toString())) {
-            game.setFirstPlayerPing(LocalDateTime.now());
+            game.setFirstPlayerPing(now);
+            game.setMatchTime(Timestamp.valueOf(now).getTime()-game.getMatchTime());
         }
 
         if(playerKey.equals(game.getSecondPlayerKey().toString())) {
-            game.setSecondPlayerPing(LocalDateTime.now());
+            game.setSecondPlayerPing(now);
+        }
+
+        if(game.getFirstPlayerPing() != null && game.getSecondPlayerPing() != null) {
+            game.setGameStatus(GameStatus.RUNNING);
         }
 
         gameRepository.save(game);

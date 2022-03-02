@@ -37,9 +37,17 @@ public class Game {
         this.secondPlayerPing = new PlayerPing(ping);
     }
 
-    private Long matchTime;
+    private long matchTime;
+
+    public void setMatchTime(long matchTime) {
+        this.matchTime = matchTime;
+    }
 
     @CreatedDate
     private LocalDateTime createDate;
     private GameStatus status;
+
+    public void setGameStatus(GameStatus gameStatus) {
+        this.status = gameStatus;
+    }
 }
