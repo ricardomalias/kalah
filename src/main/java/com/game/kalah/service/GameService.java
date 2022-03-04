@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +28,16 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
+    private Map<Integer, Integer> createBoard() {
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for(int i = 1; i <= 12; i++) {
+            map.put(i, 4);
+        }
+
+        return map;
+    }
+
     public Game createGame(GameDTO gameDTO) {
         Game build = Game.builder()
                 .firstPlayerName(gameDTO.getFirstPlayerName())
@@ -34,6 +46,7 @@ public class GameService {
                 .secondPlayerKey(UUID.randomUUID())
                 .status(GameStatus.WAITING)
                 .matchTime(0L)
+                .cups(createBoard())
                 .build();
 
         return gameRepository.save(build);
@@ -58,24 +71,35 @@ public class GameService {
     public PlayerDTO getPlayer(String playerKey) {
         Game game = getGame(playerKey);
 
+        int playerNumber = playerKey.equals(game.getFirstPlayerKey().toString()) ? 1 : 2;
+        boolean playerTurn = game.getPlayerTurn() == playerNumber || game.getPlayerTurn() == 0 && playerNumber == 1;
         String playerName = "";
         PlayerPing playerPing = null;
-        if(playerKey.equals(game.getFirstPlayerKey().toString())) {
+        int playerMancala = 0;
+
+        if(playerNumber == 1) {
             playerName = game.getFirstPlayerName();
             playerPing = game.getFirstPlayerPing();
+            playerMancala = game.getFirstPlayerMancala();
         }
 
-        if(playerKey.equals(game.getSecondPlayerKey().toString())) {
+        if(playerNumber == 2) {
             playerName = game.getSecondPlayerName();
             playerPing = game.getSecondPlayerPing();
+            playerMancala = game.getSecondPlayerMancala();
         }
 
         return PlayerDTO.builder()
+                .playerNumber(playerNumber)
                 .playerKey(playerKey)
                 .playerName(playerName)
                 .playerPing(playerPing)
+                .playerTurn(playerTurn)
+                .playerMancala(playerMancala)
                 .matchTime(game.getMatchTime())
+                .matchTurn(game.getMatchTurn())
                 .status(game.getStatus())
+                .cups(game.getCups())
                 .build();
     }
 
@@ -85,7 +109,7 @@ public class GameService {
 
         if(playerKey.equals(game.getFirstPlayerKey().toString())) {
             game.setFirstPlayerPing(now);
-            game.setMatchTime(Timestamp.valueOf(now).getTime()-game.getMatchTime());
+            game.setMatchTime(Timestamp.valueOf(now).getTime() - game.getMatchTime());
         }
 
         if(playerKey.equals(game.getSecondPlayerKey().toString())) {

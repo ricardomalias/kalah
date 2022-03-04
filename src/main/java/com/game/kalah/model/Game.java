@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Builder
@@ -37,6 +38,11 @@ public class Game {
         this.secondPlayerPing = new PlayerPing(ping);
     }
 
+    private int firstPlayerMancala;
+    private int secondPlayerMancala;
+
+    private int playerTurn;
+    private int matchTurn;
     private long matchTime;
 
     public void setMatchTime(long matchTime) {
@@ -50,4 +56,6 @@ public class Game {
     public void setGameStatus(GameStatus gameStatus) {
         this.status = gameStatus;
     }
+
+    private Map<Integer, Integer> cups;
 }
