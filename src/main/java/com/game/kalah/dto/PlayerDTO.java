@@ -22,11 +22,12 @@ public class PlayerDTO {
     private GameStatus status;
     private Map<Integer, Integer> cups;
 
-    public void setCups(Map<Integer, Integer> cups) {
-        this.cups = cups;
-    }
-
     public void addPoint(int point) {
         this.playerMancala = this.playerMancala + point;
+    }
+
+    public void endTurn(int playerTurnNumber) {
+        this.matchTurn = this.getMatchTurn() + 1;
+        this.playerTurn = this.getPlayerNumber() == playerTurnNumber;
     }
 }

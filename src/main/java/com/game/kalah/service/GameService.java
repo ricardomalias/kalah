@@ -52,7 +52,7 @@ public class GameService {
         return gameRepository.save(build);
     }
 
-    private Game getGame(String playerKey) {
+    public Game getGame(String playerKey) {
         Optional<Game> byFirstPlayerKey = gameRepository.findByFirstPlayerKey(UUID.fromString(playerKey));
 
         if(byFirstPlayerKey.isPresent()) {
@@ -72,7 +72,7 @@ public class GameService {
         Game game = getGame(playerKey);
 
         int playerNumber = playerKey.equals(game.getFirstPlayerKey().toString()) ? 1 : 2;
-        boolean playerTurn = game.getPlayerTurn() == playerNumber || game.getPlayerTurn() == 0 && playerNumber == 1;
+        boolean playerTurn = game.getPlayerTurnNumber() == playerNumber || game.getPlayerTurnNumber() == 0 && playerNumber == 1;
         String playerName = "";
         PlayerPing playerPing = null;
         int playerMancala = 0;
@@ -120,6 +120,10 @@ public class GameService {
             game.setGameStatus(GameStatus.RUNNING);
         }
 
+        gameRepository.save(game);
+    }
+
+    public void updateGame(Game game) {
         gameRepository.save(game);
     }
 }

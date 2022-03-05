@@ -41,7 +41,7 @@ public class Game {
     private int firstPlayerMancala;
     private int secondPlayerMancala;
 
-    private int playerTurn;
+    private int playerTurnNumber;
     private int matchTurn;
     private long matchTime;
 
