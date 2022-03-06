@@ -5,22 +5,28 @@ import com.game.kalah.dto.PlayerDTO;
 import com.game.kalah.dto.RoundDTO;
 import com.game.kalah.model.Game;
 import com.game.kalah.model.GameStatus;
+import com.game.kalah.util.MessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class RoundService {
 
-    public RoundService(GameService gameService) {
+    public RoundService(GameService gameService, MessageUtil messageUtil) {
         this.gameService = gameService;
+        this.messageUtil = messageUtil;
     }
+
+    private final MessageUtil messageUtil;
 
     private final GameService gameService;
 
@@ -28,11 +34,12 @@ public class RoundService {
         PlayerDTO player = gameService.getPlayer(moveDTO.getPlayerKey());
 
         if(!player.isPlayerTurn()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "not your turn");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, messageUtil.getMessage("round.not_turn"), null);
         }
 
         if(!checkPlayerMove(moveDTO, player)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "you cannot move others player cup");
+            System.out.println(messageUtil.getMessage("round.forbidden_cup"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, messageUtil.getMessage("round.forbidden_cup"), null);
         }
 
         RoundDTO roundDTO = calculateMove(moveDTO, player);
@@ -61,10 +68,12 @@ public class RoundService {
 
         if(player.getPlayerNumber() == 1) {
             gameBuilder.firstPlayerMancala(player.getPlayerMancala());
+            gameBuilder.secondPlayerMancala(game.getSecondPlayerMancala());
         }
 
         if(player.getPlayerNumber() == 2) {
             gameBuilder.secondPlayerMancala(player.getPlayerMancala());
+            gameBuilder.firstPlayerMancala(game.getFirstPlayerMancala());
         }
 
         return gameBuilder.build();
@@ -78,15 +87,29 @@ public class RoundService {
         ArrayList<Integer> listStones = createListStones(cupStones);
         Iterator<Integer> iterator = listStones.iterator();
 
-        int offset = offsetCalculator(moveDTO.getPosition(), player, iterator);
+        mancalaPoint(player, moveDTO.getPosition(), iterator);
+        int offset = offsetCalculator(moveDTO.getPosition(), player);
         int nextTurn = player.getPlayerNumber() == 1 ? 2 : 1;
 
         while(iterator.hasNext()) {
             log.info("offset is: {} cupStones: {}", offset, cupStones);
 
-            int cup = cups.get(offset);
-            cups.put(offset, cup + 1);
             iterator.next();
+
+            if(!iterator.hasNext() && cups.get(offset) == 0) {
+                Optional<Integer> intersect = getIntersect(offset, player);
+                log.info("intersect: {}", intersect);
+                if(intersect.isPresent()) {
+                    int points = cups.get(intersect.get()) + 1;
+                    player.addPoint(points);
+
+                    cups.put(offset, 0);
+                    cups.put(intersect.get(), 0);
+                }
+            } else {
+                int cup = cups.get(offset);
+                cups.put(offset, cup + 1);
+            }
 
             boolean scored = mancalaPoint(player, offset, iterator);
 
@@ -95,7 +118,7 @@ public class RoundService {
                 break;
             }
 
-            offset = offsetCalculator(offset, player, iterator);
+            offset = offsetCalculator(offset, player);
         }
 
         return RoundDTO.builder()
@@ -105,8 +128,7 @@ public class RoundService {
                 .build();
     }
 
-    private int offsetCalculator(int offset, PlayerDTO player, Iterator<Integer> iterator) {
-        mancalaPoint(player, offset, iterator);
+    private int offsetCalculator(int offset, PlayerDTO player) {
         offset++;
         if(offset > player.getCups().size()) {
             offset = 1;
@@ -120,7 +142,7 @@ public class RoundService {
             return false;
         }
 
-        if(player.getPlayerNumber() == 1 && offset == 6 || player.getPlayerNumber() == 2 && offset == 12) {
+        if((player.getPlayerNumber() == 1 && offset == 6) || (player.getPlayerNumber() == 2 && offset == 12)) {
             player.addPoint(1);
             iterator.next();
             return true;
@@ -138,13 +160,29 @@ public class RoundService {
         return stones;
     }
 
-    private int findIntersect(int offset, int total) {
-        int halfSize = total / 2;
-        return 7 - (offset % (total / 2));
-    }
-
     private boolean checkPlayerMove(MoveDTO moveDTO, PlayerDTO player) {
         return player.getPlayerNumber() == 1 && moveDTO.getPosition() < 7
                 || player.getPlayerNumber() == 2 && moveDTO.getPosition() > 6;
+    }
+
+    private Optional<Integer> getIntersect(int offset, PlayerDTO player) {
+        Map<Integer, Integer> correlation = new HashMap<>();
+        int size = player.getCups().size();
+
+        for(int i = 0; i < size/2; i++) {
+            if(player.getPlayerNumber() == 1) {
+                correlation.put(i+1, size-i);
+            }
+
+            if(player.getPlayerNumber() == 2) {
+                correlation.put(size-i, i+1);
+            }
+        }
+
+        if(correlation.containsKey(offset)) {
+            return Optional.of(correlation.get(offset));
+        }
+
+        return Optional.empty();
     }
 }
