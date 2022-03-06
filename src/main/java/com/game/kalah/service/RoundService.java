@@ -21,12 +21,9 @@ import java.util.Optional;
 @Slf4j
 public class RoundService {
 
-    public RoundService(GameService gameService, MessageUtil messageUtil) {
+    public RoundService(GameService gameService) {
         this.gameService = gameService;
-        this.messageUtil = messageUtil;
     }
-
-    private final MessageUtil messageUtil;
 
     private final GameService gameService;
 
@@ -34,12 +31,11 @@ public class RoundService {
         PlayerDTO player = gameService.getPlayer(moveDTO.getPlayerKey());
 
         if(!player.isPlayerTurn()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, messageUtil.getMessage("round.not_turn"), null);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "round.not_turn");
         }
 
         if(!checkPlayerMove(moveDTO, player)) {
-            System.out.println(messageUtil.getMessage("round.forbidden_cup"));
-            throw new ResponseStatusException(HttpStatus.CONFLICT, messageUtil.getMessage("round.forbidden_cup"), null);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "round.forbidden_cup");
         }
 
         RoundDTO roundDTO = calculateMove(moveDTO, player);

@@ -16,21 +16,16 @@ public class MessageUtil {
     }
 
     public String getMessage(String code) {
-        System.out.println(code);
-        return "abidul";
-//        try {
-//            Locale locale = LocaleContextHolder.getLocale();
-//            System.out.println("locale");
-//            System.out.println(locale.getCountry());
-//            return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-//        } catch (Exception e) {
-//            return code;
-//        }
+        try {
+            return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+        } catch (Exception e) {
+            return code;
+        }
     }
 
     public String getMessage(String code, Object[] args) {
         try {
-            return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+            return messageSource.getMessage(code, args, Locale.ENGLISH);
         } catch (Exception e) {
             return code;
         }
