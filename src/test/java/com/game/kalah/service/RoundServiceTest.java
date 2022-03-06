@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,8 +29,7 @@ class RoundServiceTest {
     @BeforeEach
     void setUp() {
         gameService = Mockito.mock(GameService.class);
-        MessageUtil messageUtil = Mockito.mock(MessageUtil.class);
-        roundService = new RoundService(gameService, messageUtil);
+        roundService = new RoundService(gameService);
 
         gameMock = Game.builder()
                 .idGame("123")
@@ -94,11 +94,9 @@ class RoundServiceTest {
         when(gameService.getGame(gameMock.getFirstPlayerKey().toString()))
                 .thenReturn(gameMock);
 
-        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> {
-            roundService.move(moveDTO);
-        });
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> roundService.move(moveDTO));
 
-        System.out.println(responseStatusException);
+        Assertions.assertTrue(Objects.requireNonNull(responseStatusException.getMessage()).contains("round.forbidden_cup"));
     }
 
     @Test
