@@ -5,7 +5,6 @@ import com.game.kalah.dto.PlayerDTO;
 import com.game.kalah.dto.RoundDTO;
 import com.game.kalah.model.Game;
 import com.game.kalah.model.GameStatus;
-import com.game.kalah.util.MessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,7 @@ public class RoundService {
 
     public PlayerDTO move(MoveDTO moveDTO) {
         PlayerDTO player = gameService.getPlayer(moveDTO.getPlayerKey());
+        log.info("move request: {} player: {}", moveDTO, player);
 
         if(!player.isPlayerTurn()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "round.not_turn");
@@ -88,8 +88,6 @@ public class RoundService {
         int nextTurn = player.getPlayerNumber() == 1 ? 2 : 1;
 
         while(iterator.hasNext()) {
-            log.info("offset is: {} cupStones: {}", offset, cupStones);
-
             iterator.next();
 
             if(!iterator.hasNext() && cups.get(offset) == 0) {
