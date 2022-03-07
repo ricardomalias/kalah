@@ -1,10 +1,10 @@
 package com.game.kalah.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
+@Builder
 public class GameDTO {
     private String firstPlayerName;
     private String secondPlayerName;

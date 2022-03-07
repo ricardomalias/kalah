@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class RoundServiceTest {
@@ -72,6 +73,7 @@ class RoundServiceTest {
                 .thenReturn(gameMock);
 
         PlayerDTO move = roundService.move(moveDTO);
+        Mockito.verify(gameService, Mockito.times(1)).updateGame(any());
 
         Assertions.assertEquals(0, move.getCups().get(positionToMove));
     }
@@ -105,6 +107,7 @@ class RoundServiceTest {
                 .thenReturn(gameMock);
 
         PlayerDTO move = roundService.move(moveDTO);
+        Mockito.verify(gameService, Mockito.times(1)).updateGame(any());
 
         Assertions.assertEquals(0, move.getCups().get(positionToMove));
     }
@@ -138,6 +141,8 @@ class RoundServiceTest {
                 .thenReturn(gameMock);
 
         ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> roundService.move(moveDTO));
+
+        Mockito.verify(gameService, Mockito.times(0)).updateGame(any());
 
         Assertions.assertTrue(Objects.requireNonNull(responseStatusException.getMessage()).contains("round.forbidden_cup"));
     }

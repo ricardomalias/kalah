@@ -65,7 +65,7 @@ public class GameService {
             return bySecondPlayerKey.get();
         }
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "player not found");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "game.player_not_found");
     }
 
     public PlayerDTO getPlayer(String playerKey) {
@@ -106,10 +106,10 @@ public class GameService {
     public void pingGame(String playerKey) {
         Game game = getGame(playerKey);
         LocalDateTime now = LocalDateTime.now();
+        game.setMatchTime(Timestamp.valueOf(now).getTime() - game.getMatchTime());
 
         if(playerKey.equals(game.getFirstPlayerKey().toString())) {
             game.setFirstPlayerPing(now);
-            game.setMatchTime(Timestamp.valueOf(now).getTime() - game.getMatchTime());
         }
 
         if(playerKey.equals(game.getSecondPlayerKey().toString())) {
