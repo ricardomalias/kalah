@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +46,7 @@ public class GameService {
                 .secondPlayerKey(UUID.randomUUID())
                 .status(GameStatus.WAITING)
                 .matchTime(0L)
+                .createDate(LocalDateTime.now())
                 .cups(createBoard())
                 .build();
 
@@ -76,17 +77,20 @@ public class GameService {
         String playerName = "";
         PlayerPing playerPing = null;
         int playerMancala = 0;
+        int opponentMancala = 0;
 
         if(playerNumber == 1) {
             playerName = game.getFirstPlayerName();
             playerPing = game.getFirstPlayerPing();
             playerMancala = game.getFirstPlayerMancala();
+            opponentMancala = game.getSecondPlayerMancala();
         }
 
         if(playerNumber == 2) {
             playerName = game.getSecondPlayerName();
             playerPing = game.getSecondPlayerPing();
             playerMancala = game.getSecondPlayerMancala();
+            opponentMancala = game.getFirstPlayerMancala();
         }
 
         return PlayerDTO.builder()
@@ -96,6 +100,7 @@ public class GameService {
                 .playerPing(playerPing)
                 .playerTurn(playerTurn)
                 .playerMancala(playerMancala)
+                .opponentMancala(opponentMancala)
                 .matchTime(game.getMatchTime())
                 .matchTurn(game.getMatchTurn())
                 .status(game.getStatus())
@@ -105,8 +110,15 @@ public class GameService {
 
     public void pingGame(String playerKey) {
         Game game = getGame(playerKey);
+
+        if(game.getStatus() == GameStatus.FINISHED) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "game.status_already_finished");
+        }
+
         LocalDateTime now = LocalDateTime.now();
-        game.setMatchTime(Timestamp.valueOf(now).getTime() - game.getMatchTime());
+        Duration between = Duration.between(now, game.getCreateDate());
+        long timestamp = Math.abs(between.toMillis());
+        game.setMatchTime(timestamp);
 
         if(playerKey.equals(game.getFirstPlayerKey().toString())) {
             game.setFirstPlayerPing(now);

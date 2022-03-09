@@ -32,8 +32,8 @@ public class GameController {
         return ResponseEntity.ok(game);
     }
 
-    @GetMapping(value = "/{playerKey}")
-    public ResponseEntity<PlayerDTO> getGame(@PathVariable String playerKey) {
+    @GetMapping(value = "/{playerKey}/player")
+    public ResponseEntity<PlayerDTO> getPlayer(@PathVariable String playerKey) {
         PlayerDTO player = gameService.getPlayer(playerKey);
 
         return ResponseEntity.ok(player);

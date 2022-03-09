@@ -17,6 +17,7 @@ public class PlayerDTO {
     private PlayerPing playerPing;
     private boolean playerTurn;
     private int playerMancala;
+    private int opponentMancala;
     private long matchTime;
     private int matchTurn;
     private GameStatus status;
