@@ -5,6 +5,7 @@ import com.game.kalah.model.PlayerPing;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Builder
@@ -20,6 +21,7 @@ public class PlayerDTO {
     private int opponentMancala;
     private long matchTime;
     private int matchTurn;
+    private LocalDateTime createDate;
     private GameStatus status;
     private Map<Integer, Integer> cups;
 

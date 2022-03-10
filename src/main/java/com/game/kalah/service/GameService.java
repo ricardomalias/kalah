@@ -103,6 +103,7 @@ public class GameService {
                 .opponentMancala(opponentMancala)
                 .matchTime(game.getMatchTime())
                 .matchTurn(game.getMatchTurn())
+                .createDate(game.getCreateDate())
                 .status(game.getStatus())
                 .cups(game.getCups())
                 .build();

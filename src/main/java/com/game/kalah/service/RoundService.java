@@ -65,6 +65,7 @@ public class RoundService {
                 .secondPlayerKey(game.getSecondPlayerKey())
                 .playerTurnNumber(roundDTO.getPlayerTurnNumber())
                 .matchTurn(player.getMatchTurn())
+                .createDate(game.getCreateDate())
                 .status(GameStatus.RUNNING)
                 .cups(roundDTO.getCups());
 

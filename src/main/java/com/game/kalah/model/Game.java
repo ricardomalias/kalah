@@ -3,7 +3,6 @@ package com.game.kalah.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -49,7 +48,6 @@ public class Game {
         this.matchTime = matchTime;
     }
 
-    @CreatedDate
     private LocalDateTime createDate;
     private GameStatus status;
 
