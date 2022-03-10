@@ -180,6 +180,38 @@ class RoundServiceTest {
     }
 
     @Test
+    void calculateCapturePiecesIntersectEmpty() {
+        MoveDTO moveDTO = MoveDTO.builder()
+                .playerKey(gameMock.getFirstPlayerKey().toString())
+                .position(4)
+                .build();
+
+        Map<Integer, Integer> cups = gameMock.getCups();
+        cups.put(5,0);
+        cups.put(8,0);
+
+        PlayerDTO playerMock = PlayerDTO.builder()
+                .playerNumber(1)
+                .playerMancala(gameMock.getFirstPlayerMancala())
+                .playerTurn(true)
+                .playerName(gameMock.getFirstPlayerName())
+                .playerKey(gameMock.getFirstPlayerKey().toString())
+                .cups(cups)
+                .status(gameMock.getStatus())
+                .build();
+
+        when(gameService.getPlayer(gameMock.getFirstPlayerKey().toString()))
+                .thenReturn(playerMock);
+
+        when(gameService.getGame(gameMock.getFirstPlayerKey().toString()))
+                .thenReturn(gameMock);
+
+        PlayerDTO move = roundService.move(moveDTO);
+
+        Assertions.assertEquals(1, move.getPlayerMancala());
+    }
+
+    @Test
     void checkTurnRepetition() {
         MoveDTO moveDTO = MoveDTO.builder()
                 .playerKey(gameMock.getFirstPlayerKey().toString())

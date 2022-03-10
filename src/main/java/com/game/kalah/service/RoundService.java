@@ -100,7 +100,7 @@ public class RoundService {
             if(!iterator.hasNext() && cups.get(offset) == 0) {
                 Optional<Integer> intersect = getIntersect(offset, player);
                 log.info("intersect: {}", intersect);
-                if(intersect.isPresent()) {
+                if(intersect.isPresent() && cups.get(intersect.get()) > 0) {
                     int points = cups.get(intersect.get()) + 1;
                     player.addPoint(points);
 
