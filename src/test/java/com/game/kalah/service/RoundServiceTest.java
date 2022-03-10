@@ -183,7 +183,7 @@ class RoundServiceTest {
     void calculateCapturePiecesIntersectEmpty() {
         MoveDTO moveDTO = MoveDTO.builder()
                 .playerKey(gameMock.getFirstPlayerKey().toString())
-                .position(4)
+                .position(1)
                 .build();
 
         Map<Integer, Integer> cups = gameMock.getCups();
@@ -208,7 +208,7 @@ class RoundServiceTest {
 
         PlayerDTO move = roundService.move(moveDTO);
 
-        Assertions.assertEquals(1, move.getPlayerMancala());
+        Assertions.assertEquals(0, move.getPlayerMancala());
     }
 
     @Test
