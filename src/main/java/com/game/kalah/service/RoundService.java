@@ -42,6 +42,12 @@ public class RoundService {
         player.endTurn(roundDTO.getPlayerTurnNumber());
 
         Game gameBuilder = roundToGame(roundDTO);
+
+        if(isEndGame(gameBuilder.getCups())) {
+            gameService.endGame(gameBuilder);
+            return gameService.getPlayer(moveDTO.getPlayerKey());
+        }
+
         gameService.updateGame(gameBuilder);
 
         return roundDTO.getPlayer();
@@ -120,6 +126,25 @@ public class RoundService {
                 .playerTurnNumber(nextTurn)
                 .cups(cups)
                 .build();
+    }
+
+    private boolean isEndGame(Map<Integer, Integer> cups) {
+        int firstPlayer = 0;
+        int secondPlayer = 0;
+
+        for(int i = 1; i <= (cups.size() / 2); i++) {
+            if(cups.get(i) == 0) {
+                firstPlayer++;
+            }
+        }
+
+        for(int i = (cups.size() / 2)+1; i <= cups.size(); i++) {
+            if(cups.get(i) == 0) {
+                secondPlayer++;
+            }
+        }
+
+        return firstPlayer == 6 || secondPlayer == 6;
     }
 
     private int offsetCalculator(int offset, PlayerDTO player) {

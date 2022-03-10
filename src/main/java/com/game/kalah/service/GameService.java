@@ -138,4 +138,36 @@ public class GameService {
     public void updateGame(Game game) {
         gameRepository.save(game);
     }
+
+    public void endGame(Game game) {
+        Map<Integer, Integer> cups = game.getCups();
+        int firstPlayerMancala = game.getFirstPlayerMancala();
+        int secondPlayerMancala = game.getSecondPlayerMancala();
+
+        for(int i = 1; i <= cups.size(); i++) {
+            if(i < 7) {
+                firstPlayerMancala = firstPlayerMancala + cups.get(i);
+                cups.put(i, 0);
+            } else {
+                secondPlayerMancala = secondPlayerMancala + cups.get(i);
+                cups.put(i, 0);
+            }
+        }
+
+        Game gameBuilder = Game.builder()
+                .idGame(game.getIdGame())
+                .firstPlayerName(game.getFirstPlayerName())
+                .secondPlayerName(game.getSecondPlayerName())
+                .firstPlayerKey(game.getFirstPlayerKey())
+                .secondPlayerKey(game.getSecondPlayerKey())
+                .playerTurnNumber(game.getPlayerTurnNumber())
+                .firstPlayerMancala(firstPlayerMancala)
+                .secondPlayerMancala(secondPlayerMancala)
+                .matchTurn(game.getMatchTurn())
+                .status(GameStatus.FINISHED)
+                .cups(cups)
+                .build();
+
+        gameRepository.save(gameBuilder);
+    }
 }

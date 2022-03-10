@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -166,6 +167,7 @@ class GameServiceTest {
                 .status(GameStatus.WAITING)
                 .matchTime(0L)
                 .cups(createBoard())
+                .createDate(LocalDateTime.now())
                 .build();
 
         when(gameRepository.findByFirstPlayerKey(uuid))
@@ -207,5 +209,26 @@ class GameServiceTest {
         }
 
         return map;
+    }
+
+    @Test
+    void endGameSuccess() {
+
+        Game game = Game.builder()
+                .firstPlayerName("Artyom")
+                .secondPlayerName("Zé")
+                .firstPlayerKey(UUID.randomUUID())
+                .secondPlayerKey(UUID.randomUUID())
+                .status(GameStatus.WAITING)
+                .matchTime(0L)
+                .cups(createBoard())
+                .build();
+
+        when(gameRepository.save(any()))
+                .thenReturn(game);
+
+        gameService.endGame(game);
+
+        Mockito.verify(gameRepository, Mockito.times(1)).save(any());
     }
 }
